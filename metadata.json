@@ -1,0 +1,6 @@
+{
+  "name": "Fish Documentary",
+  "description": "An official website for the underwater documentary 'Secret Life of Fish', featuring trailer preview, episode guides, species spotlight, synopsis, and viewer reviews.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
