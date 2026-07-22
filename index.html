@@ -34,6 +34,10 @@
           <a href="#species" class="hover:text-cyan-400 transition-colors">Species Spotlight</a>
           <a href="#bts" class="hover:text-cyan-400 transition-colors">Behind the Scenes</a>
           <a href="#reviews" class="hover:text-cyan-400 transition-colors">Acclaim</a>
+          <a href="#subscribe" class="text-cyan-400 font-semibold hover:text-cyan-300 transition-colors flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+            VIP Access
+          </a>
         </nav>
 
         <!-- Right Header Action -->
@@ -58,6 +62,7 @@
         <a href="#species" class="block text-slate-200 hover:text-cyan-400 font-medium">Species Spotlight</a>
         <a href="#bts" class="block text-slate-200 hover:text-cyan-400 font-medium">Behind the Scenes</a>
         <a href="#reviews" class="block text-slate-200 hover:text-cyan-400 font-medium">Acclaim</a>
+        <a href="#subscribe" class="block text-cyan-400 font-semibold hover:text-cyan-300">★ Join VIP Access</a>
         <button id="trailer-mobile-btn" class="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-sky-500 text-slate-950 font-bold flex items-center justify-center gap-2">
           <svg class="w-4 h-4 fill-slate-950" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
           <span>Watch Trailer</span>
@@ -500,6 +505,195 @@
               <p class="text-slate-200 italic">"Spellbinding sound design paired with 4K underwater imagery. A must-watch for nature lovers."</p>
               <div class="pt-2 border-t border-slate-800 text-xs"><strong class="text-white block">Nature Film Review</strong><span class="text-slate-400">Documentary Critics</span></div>
             </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- LEAD CAPTURE FORM SECTION (MONGODB ATLAS CONNECTED) -->
+      <section id="subscribe" class="py-20 sm:py-24 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-950 relative border-t border-cyan-900/40 overflow-hidden">
+        <!-- Ambient Water Ripples Background Effect -->
+        <div class="absolute inset-0 z-0 pointer-events-none opacity-25">
+          <div class="absolute -top-32 -left-32 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl"></div>
+          <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-sky-500/20 rounded-full blur-3xl"></div>
+        </div>
+
+        <div class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-12 shadow-2xl backdrop-blur-xl relative overflow-hidden">
+            <!-- Decorative Accent Line -->
+            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 via-sky-400 to-teal-400"></div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+              
+              <!-- Left Column: Copy & Details -->
+              <div class="lg:col-span-5 space-y-6 text-left">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 uppercase tracking-wider">
+                  <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                  Exclusive VIP Access
+                </div>
+
+                <h2 class="text-3xl sm:text-4xl font-black text-white tracking-tight leading-snug">
+                  Join the Ocean Explorer VIP List
+                </h2>
+
+                <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                  Be the first to receive unreleased 4K deep-sea footage, director Q&A invitations, marine species research reports, and upcoming screening dates.
+                </p>
+
+                <!-- MongoDB Connection Status Badge & Atlas Info -->
+                <div id="mongo-status-badge" class="p-4 bg-slate-950 border border-slate-800 rounded-2xl space-y-2.5 text-xs text-slate-300 shadow-lg">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span id="mongo-status-dot" class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse shadow-sm shadow-amber-400/50"></span>
+                      <span id="mongo-status-text" class="font-bold text-amber-300">MongoDB Atlas: Not Connected</span>
+                    </div>
+                    <span id="subscribers-count-badge" class="text-amber-300 font-semibold bg-amber-950/80 px-2.5 py-0.5 rounded-full border border-amber-800/50">
+                      URI Needed
+                    </span>
+                  </div>
+                  
+                  <div class="text-[11px] text-slate-400 space-y-1 pt-2 border-t border-slate-900">
+                    <div class="flex items-center justify-between">
+                      <span>Cluster:</span>
+                      <span class="font-bold text-slate-200 font-mono">TestingSiteFish</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <span>Target Database:</span>
+                      <span class="font-bold text-cyan-300 font-mono bg-slate-900 px-2 py-0.5 rounded">Documentary_Updates</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <span>Target Collection:</span>
+                      <span class="font-medium text-slate-300 font-mono">subscribers</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- MongoDB Connection Config Drawer -->
+                <div id="mongo-config-box" class="p-4 bg-slate-950 border-2 border-amber-500/70 rounded-2xl space-y-3 text-xs text-slate-300 shadow-2xl">
+                  <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                    <span class="font-bold text-amber-300 flex items-center gap-1.5 text-xs">
+                      <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                      Step 1: Connect Your MongoDB Atlas Cluster
+                    </span>
+                  </div>
+                  
+                  <p class="text-[11px] text-slate-300 leading-relaxed">
+                    To write directly into cluster <strong class="text-white font-mono">TestingSiteFish</strong> and create database <strong class="text-cyan-300 font-mono">Documentary_Updates</strong>, paste your Atlas connection string below with your database password:
+                  </p>
+
+                  <div class="space-y-1">
+                    <label for="custom-mongo-uri-input" class="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                      MongoDB Connection URI
+                    </label>
+                    <input 
+                      type="text" 
+                      id="custom-mongo-uri-input" 
+                      placeholder="mongodb+srv://<user>:<password>@TestingSiteFish.xxx.mongodb.net/Documentary_Updates?retryWrites=true&w=majority"
+                      class="w-full bg-slate-900 border border-slate-700 focus:border-cyan-400 rounded-xl px-3 py-2 text-xs text-cyan-200 placeholder-slate-600 outline-none font-mono"
+                    />
+                  </div>
+
+                  <div class="flex gap-2">
+                    <button type="button" id="save-mongo-uri-btn" class="w-full py-2.5 px-3 bg-gradient-to-r from-amber-400 to-cyan-400 hover:from-amber-300 hover:to-cyan-300 text-slate-950 font-bold rounded-xl transition-all cursor-pointer text-center text-xs shadow-md">
+                      Connect & Create "Documentary_Updates" DB
+                    </button>
+                  </div>
+                  <div id="mongo-config-feedback" class="text-[11px] font-medium hidden"></div>
+                </div>
+
+                <ul class="space-y-2.5 text-xs text-slate-400">
+                  <li class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-cyan-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <span>Automatic database synchronization with MongoDB Atlas</span>
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-cyan-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    <span>Zero spam guaranteed • Unsubscribe anytime with 1 click</span>
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Right Column: Interactive Lead Form -->
+              <div class="lg:col-span-7">
+                <form id="lead-capture-form" class="bg-slate-950/90 border border-slate-800 rounded-2xl p-5 sm:p-8 space-y-5 shadow-inner">
+                  
+                  <!-- Form Title -->
+                  <div class="border-b border-slate-800 pb-3">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                      <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                      </svg>
+                      Subscribe for Documentary Updates
+                    </h3>
+                    <p class="text-xs text-slate-400 mt-1">Enter your details below to save your email in our MongoDB Atlas database.</p>
+                  </div>
+
+                  <!-- Email Address Field (Required) -->
+                  <div class="space-y-1.5">
+                    <label for="lead-email" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                      Email Address <span class="text-cyan-400">*</span>
+                    </label>
+                    <input 
+                      type="email" 
+                      id="lead-email" 
+                      name="email"
+                      required 
+                      placeholder="you@example.com"
+                      class="w-full bg-slate-900 border border-slate-800 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 outline-none transition-all"
+                    />
+                  </div>
+
+                  <!-- Name Field (Optional) -->
+                  <div class="space-y-1.5">
+                    <label for="lead-name" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                      Full Name
+                    </label>
+                    <input 
+                      type="text" 
+                      id="lead-name" 
+                      name="name"
+                      placeholder="e.g. Sylvia Earle"
+                      class="w-full bg-slate-900 border border-slate-800 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 outline-none transition-all"
+                    />
+                  </div>
+
+                  <!-- Primary Interest Field -->
+                  <div class="space-y-1.5">
+                    <label for="lead-interest" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                      Primary Aquatic Interest
+                    </label>
+                    <select 
+                      id="lead-interest" 
+                      name="interest"
+                      class="w-full bg-slate-900 border border-slate-800 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 rounded-xl px-4 py-3 text-sm text-slate-200 outline-none transition-all cursor-pointer"
+                    >
+                      <option value="Deep-Sea Marine Life">Deep-Sea Marine Life & Bioluminescence</option>
+                      <option value="Coral Reef Ecosystems">Coral Reef Ecosystems & Conservation</option>
+                      <option value="Pelagic Predators">Sharks & Pelagic Predators</option>
+                      <option value="Submersible Tech">Deep Submersible & Camera Tech</option>
+                      <option value="General Updates">General Documentary Updates</option>
+                    </select>
+                  </div>
+
+                  <!-- Submit Button -->
+                  <button 
+                    type="submit" 
+                    id="lead-submit-btn"
+                    class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-teal-400 hover:from-cyan-400 hover:to-teal-300 text-slate-950 font-bold text-sm shadow-lg shadow-cyan-500/25 flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer group"
+                  >
+                    <span id="btn-text">Save Email & Connect to MongoDB</span>
+                    <svg id="btn-icon" class="w-4 h-4 fill-slate-950 group-hover:translate-x-0.5 transition-transform" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                  </button>
+
+                  <!-- Dynamic Feedback Message Box -->
+                  <div id="lead-feedback" class="hidden rounded-xl p-4 text-xs font-medium transition-all duration-300"></div>
+
+                </form>
+              </div>
+
+            </div>
+
           </div>
 
         </div>
