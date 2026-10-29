@@ -1,0 +1,11 @@
+{
+  "name": "secretlifeoffish-mods",
+  "owner": { "name": "rjirz0" },
+  "plugins": [
+    {
+      "name": "savvy-progress",
+      "source": "./claude-mods/savvy-progress",
+      "description": "Savvy Progress: a percentage bar for multi-step tasks and a live status table of sub-agents"
+    }
+  ]
+}

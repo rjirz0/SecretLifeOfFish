@@ -14,3 +14,21 @@ Commands:
 Stages come from Claude's own todo/task tools. Agents come from the Agent tool and any `agent.spawn`. Nothing needs configuring.
 
 Install locally: `claude --plugin-dir ./claude-mods/savvy-progress`.
+
+## Install
+
+In a terminal session, at the prompt:
+
+```
+/plugin install savvy-progress --marketplace rjirz0/SecretLifeOfFish
+```
+
+From a shell:
+
+```
+claude plugin install savvy-progress --marketplace rjirz0/SecretLifeOfFish
+```
+
+In the desktop app: click **+** next to the prompt box, then **Plugins**, **Add marketplace** with `rjirz0/SecretLifeOfFish`, then **Add plugin** and pick savvy-progress.
+
+The marketplace reads the `main` branch, so merge this folder and `.claude-plugin/marketplace.json` into `main` first.
