@@ -56,3 +56,37 @@ test('a spawned agent shows as a Running card', async ($, on) => {
   expect((await ui.find({ type: 'Text', text: /Running · 1/ }))?.text).toContain('Running')
   await ui.unmount()
 })
+
+test('the band shows the tasks pill and the agent count', async ($, on) => {
+  on('agent.list', () => ({ value: [] }))
+  on('clock.now', () => ({ value: 0 }))
+  on('ui.toast', () => ({ value: undefined }))
+  on('ui.status', () => ({ value: undefined }))
+  on('tool.call', () => ({ result: {} }))
+  on('agent.spawn', () => ({ model: 'sonnet', agentId: 'a1' }))
+
+  await $.tool.call({
+    tool: 'TodoWrite',
+    todos: [
+      { content: 'One', status: 'completed', activeForm: 'One' },
+      { content: 'Two', status: 'completed', activeForm: 'Two' },
+      { content: 'Three', status: 'pending', activeForm: 'Three' },
+      { content: 'Four', status: 'pending', activeForm: 'Four' },
+      { content: 'Five', status: 'pending', activeForm: 'Five' },
+      { content: 'Six', status: 'pending', activeForm: 'Six' },
+    ],
+  })
+  await $.agent.spawn({ prompt: 'Do it', description: 'Launch emails' })
+
+  for (const surface of ['terminal', 'desktop'] as const) {
+    const ui = await $.ui.mount({
+      plugin: 'savvy-progress',
+      component: 'AbovePrompt',
+      surface,
+      props: { hasSurvey: false, isWorking: false, maxRows: 4, scroll: { offset: 0, bodyRows: 4 } },
+    } as never)
+    expect((await ui.find({ type: 'Text', text: /33%/ }))?.text).toBe('33%')
+    expect((await ui.find({ type: 'Text', text: /×1/ }))?.text).toBe('×1')
+    await ui.unmount()
+  }
+})

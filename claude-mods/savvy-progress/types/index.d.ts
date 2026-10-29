@@ -25,6 +25,7 @@ declare module 'claude-code' {
       title: string
       stages: Shaped<Stage[]>
       agents: Shaped<AgentRow[]>
+      bandHidden: boolean
     }
   }
 }

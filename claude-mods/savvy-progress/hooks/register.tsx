@@ -10,6 +10,7 @@ const title = atom({ plugin: 'savvy-progress', key: 'title' } as const, 'Current
 // version stored, which outlives a reload.
 const stages = atom({ plugin: 'savvy-progress', key: 'stages' } as const, [], { shape: 'stages-1' })
 const agents = atom({ plugin: 'savvy-progress', key: 'agents' } as const, [], { shape: 'agents-1' })
+const bandHidden = atom({ plugin: 'savvy-progress', key: 'bandHidden' } as const, false)
 
 // ---------- pure helpers ----------
 
@@ -76,6 +77,52 @@ async function setStages($: EngineInterface, fn: (list: Stage[]) => Stage[]): Pr
   return newlyDone
 }
 
+// The band's track: a lavender pill over a dark rail with a tick per stage
+function trackSvg(done: number, total: number, label: string): string {
+  const W = 300
+  const H = 24
+  const pill = Math.max(110, total > 0 ? Math.round((done / total) * W) : 0)
+  const ticks = []
+  for (let i = 1; i < total; i++) {
+    const x = Math.round((i / total) * W)
+    if (x > pill + 6) ticks.push(`<rect x="${x}" y="8" width="2" height="8" fill="#5b5b66"/>`)
+  }
+  const dots = [0, 1, 2]
+    .map(r => `<rect x="${pill - 8 + (r % 2) * 3}" y="${6 + r * 5}" width="2" height="2" fill="#c9c4ff"/>`)
+    .join('')
+
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">` +
+    `<rect x="0" y="0" width="${W}" height="${H}" rx="12" fill="#2a2a31"/>` +
+    ticks.join('') +
+    `<rect x="0" y="0" width="${pill}" height="${H}" rx="12" fill="#9b93f0"/>` +
+    dots +
+    `<text x="${pill / 2}" y="16.5" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" font-weight="600" fill="#1b1740">${label}</text>` +
+    `</svg>`
+  )
+}
+
+function textTrack(done: number, total: number, width: number): string {
+  if (total === 0) return '░'.repeat(width)
+  const filled = Math.round((done / total) * width)
+  let out = ''
+  for (let i = 0; i < width; i++) {
+    // A tick where the cell crosses into the next stage
+    const isTick = Math.floor((i * total) / width) !== Math.floor(((i - 1) * total) / width)
+    out += i < filled ? '█' : isTick && i > 0 ? '│' : '░'
+  }
+  return out
+}
+
+const CRITTER_SVG =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="20" viewBox="0 0 13 10" shape-rendering="crispEdges">' +
+  '<rect x="3" y="1" width="7" height="5" fill="#e07a5f"/>' +
+  '<rect x="1" y="3" width="2" height="2" fill="#e07a5f"/><rect x="10" y="3" width="2" height="2" fill="#e07a5f"/>' +
+  '<rect x="4" y="2" width="1" height="2" fill="#1d2733"/><rect x="8" y="2" width="1" height="2" fill="#1d2733"/>' +
+  '<rect x="3" y="6" width="1" height="3" fill="#e07a5f"/><rect x="5" y="6" width="1" height="3" fill="#e07a5f"/>' +
+  '<rect x="7" y="6" width="1" height="3" fill="#e07a5f"/><rect x="9" y="6" width="1" height="3" fill="#e07a5f"/>' +
+  '</svg>'
+
 async function textReport($: EngineInterface, name: string, list: Stage[], rows: AgentRow[]): Promise<string> {
   const now = await $.clock.now()
   const live = new Map((await $.agent.list()).map(a => [a.id, a.status]))
@@ -127,6 +174,7 @@ export const register: Register = on => {
   on('command.run', { command: 'savvy' }, async ($, e) => {
     const name = e.args.trim()
     if (name) await update($, title, () => name)
+    await update($, bandHidden, () => false)
     const opened = await $.ui.open({ id: PANE, title: 'Savvy Progress' })
     const list = await read($, stages)
     const rows = await read($, agents)
@@ -310,30 +358,39 @@ export const register: Register = on => {
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const list = await read($, stages)
     const rows = await read($, agents)
-    if (e.props.hasSurvey || (list.length === 0 && rows.length === 0)) return next(e)
+    const isQuiet = e.props.hasSurvey || (await read($, bandHidden))
+    if (isQuiet || (list.length === 0 && rows.length === 0)) return next(e)
 
-    const { Box, Text, Button } = $.ui.resolve(e)
+    const els = $.ui.resolve(e)
+    const { Box, Text, Button } = els
     const name = await read($, title)
     const done = list.filter(s => s.status === 'completed').length
     const pct = percent(list)
-    const running = rows.filter(a => a.state === 'In Progress').length
-    const waiting = rows.filter(a => a.state === 'Waiting').length
+    const active = rows.filter(a => a.state === 'In Progress' || a.state === 'Waiting').length
+    const hide = () => update($, bandHidden, () => true)
+    const label = `Tasks ${done}/${list.length}`
+    const Svg = 'Svg' in els ? els.Svg : undefined
 
     return (
-      <Box flexDirection="row" gap={1}>
-        <Text color="suggestion">●</Text>
+      <Box flexDirection="row" gap={2} alignItems="center">
+        <Text color="#9b93f0">●</Text>
         <Text weight="bold">{name}</Text>
-        {list.length > 0 && (
+        {Svg ? (
+          <Svg source={trackSvg(done, list.length, label)} alt={`${label}, ${pct}%`} width={300} height={24} />
+        ) : (
           <Text>
-            Tasks {done}/{list.length} <Text color="suggestion">{bar(pct, 16)}</Text> {pct}%
+            <Text backgroundColor="#9b93f0" color="#1b1740"> {label} </Text>
+            <Text color="#9b93f0">{textTrack(done, list.length, 24)}</Text>
           </Text>
         )}
-        {rows.length > 0 && (
-          <Text dimColor>
-            · agents {running} running{waiting > 0 ? `, ${waiting} waiting` : ''}
-          </Text>
+        <Text dimColor>{pct}%</Text>
+        {Svg ? (
+          <Svg source={CRITTER_SVG} alt="agents" width={26} height={20} />
+        ) : (
+          <Text color="#e07a5f">▟▙</Text>
         )}
-        <Button key="open" label="Panel" onPress={() => $.ui.open({ id: PANE, title: 'Savvy Progress' })} />
+        <Text weight="bold">×{active}</Text>
+        <Button key="hide" label="×" onPress={hide} />
       </Box>
     )
   })
