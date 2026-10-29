@@ -43,3 +43,16 @@ test('stages drive the percentage bar, on every surface', async ($, on) => {
     await ui.unmount()
   }
 })
+
+test('a spawned agent shows as a Running card', async ($, on) => {
+  on('agent.list', () => ({ value: [] }))
+  on('clock.now', () => ({ value: 0 }))
+  on('agent.spawn', () => ({ model: 'sonnet', agentId: 'a1' }))
+
+  await $.agent.spawn({ prompt: 'Write the launch emails', description: 'Launch emails' })
+
+  const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  expect((await ui.find({ type: 'Text', text: /Launch emails/ }))?.text).toBe('Launch emails')
+  expect((await ui.find({ type: 'Text', text: /Running · 1/ }))?.text).toContain('Running')
+  await ui.unmount()
+})

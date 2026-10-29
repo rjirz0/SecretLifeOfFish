@@ -98,9 +98,15 @@ export const register: Register = on => {
   on('command.run', { command: 'savvy' }, async ($, e) => {
     const name = e.args.trim()
     if (name) await update($, title, () => name)
-    await $.ui.open({ id: PANE, title: 'Savvy Progress' })
+    const opened = await $.ui.open({ id: PANE, title: 'Savvy Progress' })
+    const list = await read($, stages)
+    const rows = await read($, agents)
+    const tracked = `${list.filter(s => s.status === 'completed').length}/${list.length} stages, ${rows.length} agents`
+    const pane = opened.isPlaced
+      ? 'panel open'
+      : `panel not placed: ${'reason' in opened ? opened.reason : 'unknown'}`
 
-    return { text: name ? `Savvy Progress tracking "${name}".` : 'Savvy Progress panel opened.' }
+    return { text: `Savvy Progress "${await read($, title)}" · ${tracked} · ${pane}` }
   })
 
   on('command.run', { command: 'savvy-reset' }, async $ => {
@@ -307,7 +313,8 @@ export const register: Register = on => {
     const list = await read($, stages)
     const rows = await read($, agents)
     const now = await $.clock.now()
-    const cols = Math.max(40, e.viewport?.columns ?? 60)
+    const cols = Math.max(32, e.props.bodyColumns ?? e.viewport?.columns ?? 60)
+    const barW = Math.max(10, Math.min(40, cols - 14))
     const pct = percent(list)
     const done = list.filter(s => s.status === 'completed').length
 
@@ -318,22 +325,64 @@ export const register: Register = on => {
       const isEnded = a.state === 'Completed' || a.state === 'Failed'
       return status && !isEnded ? { ...a, state: liveState(status) } : a
     })
+    const running = merged.filter(a => a.state === 'In Progress')
+    const waiting = merged.filter(a => a.state === 'Waiting')
+    const finished = merged.filter(a => a.state === 'Completed' || a.state === 'Failed')
+    const busiest = Math.max(1, ...merged.map(a => a.tools))
+    const firstStart = Math.min(now, ...merged.map(a => a.startedAt))
 
-    const descW = Math.max(12, cols - 34)
-    const header = `${cell('Agent', descW)} ${cell('State', 12)} ${cell('Tools', 6)} ${cell('Time', 6)}`
+    const stat = (label: string, value: string) => (
+      <Box key={label} flexDirection="column" borderStyle="round" borderDimColor paddingX={1} flexGrow={1}>
+        <Text dimColor>{label}</Text>
+        <Text weight="bold">{value}</Text>
+      </Box>
+    )
+
+    const card = (a: AgentRow) => {
+      const isEnded = a.state === 'Completed' || a.state === 'Failed'
+      const fill = isEnded ? 100 : Math.round((a.tools / busiest) * 100)
+      return (
+        <Box key={a.key} flexDirection="column">
+          <Box flexDirection="row" justifyContent="space-between">
+            <Text weight="bold">{a.description}</Text>
+            <Text color={STATE_COLOR[a.state]}>● {a.state}</Text>
+          </Box>
+          <Text>
+            <Text color="suggestion">{a.type}</Text>
+            <Text dimColor>
+              {' '}· {a.tools} tool calls · {elapsed(a.startedAt, a.endedAt ?? now)}
+            </Text>
+          </Text>
+          <Text color={STATE_COLOR[a.state]}>{bar(fill, barW)}</Text>
+        </Box>
+      )
+    }
+
+    const group = (label: string, list: typeof merged) =>
+      list.length > 0 && (
+        <Box key={label} flexDirection="column" gap={1}>
+          <Text weight="bold">
+            ▾ {label} · {list.length}
+          </Text>
+          {list.map(card)}
+        </Box>
+      )
 
     return (
       <Box flexDirection="column" gap={1}>
-        <Box flexDirection="column">
-          <Text weight="bold">{name}</Text>
-          <Text>
-            <Text color="suggestion">{bar(pct, Math.min(30, cols - 18))}</Text> {pct}% ({done}/{list.length})
-          </Text>
+        <Text weight="bold">{name}</Text>
+
+        <Box flexDirection="row" gap={1}>
+          {stat('Stages', `${done}/${list.length}`)}
+          {stat('Agents', String(merged.length))}
+          {stat('Time', merged.length > 0 ? elapsed(firstStart, now) : '0:00')}
         </Box>
 
         <Box flexDirection="column">
-          <Text weight="bold">Stages</Text>
-          {list.length === 0 && <Text dimColor>No stages yet — they appear when a todo or task list is made.</Text>}
+          <Text>
+            <Text color="suggestion">{bar(pct, barW)}</Text> {pct}% ({done}/{list.length})
+          </Text>
+          {list.length === 0 && <Text dimColor>No stages yet: they appear when a todo or task list is made.</Text>}
           {list.map(s => (
             <Text key={s.id} dimColor={s.status === 'completed'} color={s.status === 'in_progress' ? 'suggestion' : undefined}>
               {STAGE_MARK[s.status]} {s.title}
@@ -341,28 +390,10 @@ export const register: Register = on => {
           ))}
         </Box>
 
-        <Box flexDirection="column">
-          <Text weight="bold">Agents</Text>
-          {merged.length === 0 ? (
-            <Text dimColor>No sub-agents in this session yet.</Text>
-          ) : (
-            <Box flexDirection="column">
-              <Text dimColor>{header}</Text>
-              {merged.map(a => (
-                <Text key={a.key}>
-                  {cell(a.description, descW)}{' '}
-                  <Text color={STATE_COLOR[a.state]}>{cell(a.state, 12)}</Text>{' '}
-                  {cell(String(a.tools), 6)} {cell(elapsed(a.startedAt, a.endedAt ?? now), 6)}
-                </Text>
-              ))}
-              <Text dimColor>
-                {merged.filter(a => a.state === 'In Progress').length} in progress ·{' '}
-                {merged.filter(a => a.state === 'Waiting').length} waiting ·{' '}
-                {merged.filter(a => a.state === 'Completed').length} completed
-              </Text>
-            </Box>
-          )}
-        </Box>
+        {merged.length === 0 && <Text dimColor>No sub-agents in this session yet.</Text>}
+        {group('Running', running)}
+        {group('Waiting', waiting)}
+        {group('Finished', finished)}
       </Box>
     )
   })
