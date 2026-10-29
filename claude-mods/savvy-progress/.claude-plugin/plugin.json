@@ -1,0 +1,6 @@
+{
+  "name": "savvy-progress",
+  "version": "0.1.0",
+  "description": "Savvy Progress: a percentage bar for multi-step tasks and a live status table of sub-agents",
+  "types": "./types/index.d.ts"
+}
