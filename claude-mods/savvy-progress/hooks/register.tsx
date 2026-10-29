@@ -76,6 +76,35 @@ async function setStages($: EngineInterface, fn: (list: Stage[]) => Stage[]): Pr
   return newlyDone
 }
 
+async function textReport($: EngineInterface, name: string, list: Stage[], rows: AgentRow[]): Promise<string> {
+  const now = await $.clock.now()
+  const live = new Map((await $.agent.list()).map(a => [a.id, a.status]))
+  const pct = percent(list)
+  const done = list.filter(s => s.status === 'completed').length
+  const lines = [
+    `Savvy Progress: ${name}`,
+    `[${bar(pct)}] ${pct}%  (${done}/${list.length} stages)`,
+    '',
+    ...(list.length === 0 ? ['No stages yet.'] : list.map(s => `${STAGE_MARK[s.status]} ${s.title}`)),
+    '',
+  ]
+  if (rows.length === 0) {
+    lines.push('No sub-agents yet.')
+  } else {
+    lines.push(`${cell('Agent', 28)} ${cell('State', 12)} ${cell('Tools', 6)} Time`)
+    for (const a of rows) {
+      const status = a.agentId ? live.get(a.agentId) : undefined
+      const isEnded = a.state === 'Completed' || a.state === 'Failed'
+      const state = status && !isEnded ? liveState(status) : a.state
+      lines.push(
+        `${cell(a.description, 28)} ${cell(state, 12)} ${cell(String(a.tools), 6)} ${elapsed(a.startedAt, a.endedAt ?? now)}`,
+      )
+    }
+  }
+
+  return lines.join('\n')
+}
+
 export const register: Register = on => {
   // Stages finished during the current main-loop turn, reported at its end
   let finishedThisTurn: string[] = []
@@ -106,7 +135,11 @@ export const register: Register = on => {
       ? 'panel open'
       : `panel not placed: ${'reason' in opened ? opened.reason : 'unknown'}`
 
-    return { text: `Savvy Progress "${await read($, title)}" · ${tracked} · ${pane}` }
+    const name2 = await read($, title)
+    if (opened.isPlaced) return { text: `Savvy Progress "${name2}" · ${tracked} · ${pane}` }
+
+    // No surface to draw the panel: print the report as the command's answer
+    return { text: await textReport($, name2, list, rows) }
   })
 
   on('command.run', { command: 'savvy-reset' }, async $ => {
